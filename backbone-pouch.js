@@ -78,6 +78,9 @@
       options = options || {};
       options = extend(defaults, model && model.pouch || {}, options);
 
+      //Get the options from the model's collection if it's not specified on the model
+      options = extend(options, model && model.collection && model.collection.pouch);
+
       // This is to get the options (especially options.db)
       // by calling model.sync() without arguments.
       if (typeof method !== 'string') {
