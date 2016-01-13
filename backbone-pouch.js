@@ -102,6 +102,12 @@
             _rev: response.rev
           };
         }
+        
+        //when saving a new model, augment the response with the original attributes
+        if (method === 'create') {
+            _.extend(response, model.toJSON())      //TODO - model.toJSON(), or model.attributes ?
+        }
+                
         if (method === 'delete') {
           response = {};
         }
