@@ -40,8 +40,9 @@
       allDocs: {},
       query: {},
       spatial: {},
+      search: {},
       changes: {
-        continuous: true
+        live: true
       }
     }
   };
@@ -107,7 +108,7 @@
         if (method === 'create') {
             _.extend(response, model.toJSON())      //TODO - model.toJSON(), or model.attributes ?
         }
-                
+        
         if (method === 'delete') {
           response = {};
         }
@@ -120,27 +121,28 @@
               // get changes since info.update_seq
               _.result(options, 'db').changes(_.extend({}, options.options.changes, {
                 since: info.update_seq,
-                onChange: function(change) {
+              }))
+              .on('change', function(change) {
                   var todo = model.get(change.id);
-
+                  
                   if (change.deleted) {
-                    if (todo) {
-                      todo.destroy();
-                    }
+                      if (todo) {
+                          todo.destroy();
+                      }
                   } else {
-                    if (todo) {
-                      todo.set(change.doc);
-                    } else {
-                      model.add(change.doc);
-                    }
+                      if (todo) {
+                          todo.set(change.doc);
+                      } else {
+                          model.add(change.doc);
+                      }
                   }
-
+                  
                   // call original onChange if present
                   if (typeof options.options.changes.onChange === 'function') {
-                    options.options.changes.onChange(change);
+                      options.options.changes.onChange(change);
                   }
-                }
-              }));
+                  
+              });
             });
           }
         }
